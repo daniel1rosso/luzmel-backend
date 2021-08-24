@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const ProductoModel = require('../models/ProductoModel');
-const checkAuth = require('../middleware/checkAuth');
-
 //--- Todos los productos ---//
-router.get('/', checkAuth, async(req, res) => {
+router.get('/', async(req, res) => {
     try {
         const productos = await ProductoModel.find();
         res.status(201).json(productos);
@@ -14,7 +12,7 @@ router.get('/', checkAuth, async(req, res) => {
 });
 
 //--- Datos de un producto ---//
-router.get('/:producto_id', checkAuth, async(req, res) => {
+router.get('/:producto_id', async(req, res) => {
     try {
         const producto = await ProductoModel.find({ _id: req.params.producto_id });
         res.status(201).json(producto);
@@ -24,7 +22,7 @@ router.get('/:producto_id', checkAuth, async(req, res) => {
 });
 
 //--- Nuevo Producto ---//
-router.post('/new_producto', checkAuth, async(req, res) => {
+router.post('/new_producto', async(req, res) => {
     try {
         const existingProducto = await ProductoModel.find({ nombre: req.body.nombre})
         if (existingProducto.length !== 0) {
@@ -53,7 +51,7 @@ router.post('/new_producto', checkAuth, async(req, res) => {
 });
 
 //--- Actualizacion de producto ---//
-router.put('/:producto_id', checkAuth, (req, res) => {
+router.put('/:producto_id', (req, res) => {
     //--- Update Producto ---//
     ProductoModel.updateMany({ _id: req.params.producto_id }, { $set: req.body }).exec()
     .then(async () => {
@@ -64,7 +62,7 @@ router.put('/:producto_id', checkAuth, (req, res) => {
 });
 
 //--- Borrado de producto ---//
-router.delete('/:productoID', checkAuth, async(req, res) => {
+router.delete('/:productoID', async(req, res) => {
     try {
         //--- Delete Producto ---//
         const deleteProducto = await ProductoModel.deleteOne({ _id: req.params.productoID }).exec()

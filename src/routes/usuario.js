@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt')
 const UsuarioModel = require('../models/UsuarioModel');
-const checkAuth = require('../middleware/checkAuth');
 
 //--- Todos los usuarios ---//
-router.get('/', checkAuth, async(req, res) => {
+router.get('/', async(req, res) => {
     try {
         const users = await UsuarioModel.find();
         res.status(201).json(users);
@@ -15,7 +14,7 @@ router.get('/', checkAuth, async(req, res) => {
 });
 
 //--- Datos de un usuario ---//
-router.get('/:user_id', checkAuth, async(req, res) => {
+router.get('/:user_id', async(req, res) => {
     try {
         const user = await UsuarioModel.find({ _id: req.params.user_id });
         res.status(201).json(user);
@@ -25,32 +24,17 @@ router.get('/:user_id', checkAuth, async(req, res) => {
 });
 
 //--- Nuevo usuario ---//
-router.post('/signup', checkAuth, async(req, res) => {
+router.post('/signup', async(req, res) => {
     try {
-        const existingUser = await UsuarioModel.find({ username: req.body.username })
+        const existingUser = await UsuarioModel.find({ nombreUsuario: req.body.nombreUsuario })
         if (existingUser.length !== 0) {
             return res.status(409).json({ message: "The User does exist ..." })
         }
-        const hashPassword = await bcrypt.hash(req.body.password, 10);
+        const hashPassword = await bcrypt.hash(req.body.contra, 10);
         
         const user = new UsuarioModel({
-            
-            nombre: req.body.nombre,
-            apellido: req.body.apellido,
-            email: req.body.email,
-            telefono: req.body.telefono,
-            username: req.body.username,
-            password: hashPassword,
-            localidad: req.body.comuna,
-            provincia: req.body.provincia,
-            activo: {
-                "id": 0,
-                "nombre": "Activo"
-            },
-            rol: {
-                "id": 2,
-                "nombre": "Usuario"
-            }
+            nombreUsuario: req.body.nombreUsuario,
+            contra: hashPassword
         });
         //--- New User ---//
         const createdUser = await user.save()
@@ -61,7 +45,7 @@ router.post('/signup', checkAuth, async(req, res) => {
 });
 
 //--- Actualizacion de usuario ---//
-router.put('/:user_id', checkAuth, async (req, res) => {
+router.put('/:user_id', async (req, res) => {
     try {
         //--- Hash Password ---//
         req.body.password = await bcrypt.hash(req.body.password, 10)
@@ -78,7 +62,7 @@ router.put('/:user_id', checkAuth, async (req, res) => {
 });
 
 //--- Borrado de usuario ---//
-router.delete('/:userID', checkAuth, async(req, res) => {
+router.delete('/:userID', async(req, res) => {
     try {
         //--- Delete User ---//
         const deleteUser = await UsuarioModel.deleteOne({ _id: req.params.userID })

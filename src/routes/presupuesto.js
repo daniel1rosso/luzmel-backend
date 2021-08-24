@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const PresupuestoModel = require('../models/PresupuestoModel');
-const checkAuth = require('../middleware/checkAuth');
 
 //--- Todos los presupuestos ---//
-router.get('/', checkAuth, async(req, res) => {
+router.get('/', async(req, res) => {
     try {
         const presupuestos = await PresupuestoModel.find();
         res.status(201).json(presupuestos);
@@ -14,7 +13,7 @@ router.get('/', checkAuth, async(req, res) => {
 });
 
 //--- Datos de una presupuesto ---//
-router.get('/:presupuesto_id', checkAuth, async(req, res) => {
+router.get('/:presupuesto_id', async(req, res) => {
     try {
         const presupuesto = await PresupuestoModel.find({ _id: req.params.presupuesto_id });
         res.status(201).json(presupuesto);
@@ -24,7 +23,7 @@ router.get('/:presupuesto_id', checkAuth, async(req, res) => {
 });
 
 //--- Nuevo presupuesto ---//
-router.post('/new_presupuesto', checkAuth, async(req, res) => {
+router.post('/new_presupuesto', async(req, res) => {
     try {
 
         const presupuesto = new PresupuestoModel({
@@ -45,7 +44,7 @@ router.post('/new_presupuesto', checkAuth, async(req, res) => {
 });
 
 //--- Actualizacion de un presupuesto ---//
-router.put('/:presupuesto_id', checkAuth, (req, res) => {
+router.put('/:presupuesto_id', (req, res) => {
     //--- Update presupuesto ---//
     PresupuestoModel.updateMany({ _id: req.params.presupuesto_id }, { $set: req.body }).exec()
     .then(async () => {
@@ -56,7 +55,7 @@ router.put('/:presupuesto_id', checkAuth, (req, res) => {
 });
 
 //--- Borrado de un presupuesto ---//
-router.delete('/:presupuestoID', checkAuth, async(req, res) => {
+router.delete('/:presupuestoID', async(req, res) => {
     try {
         //--- Delete Presupuesto ---//
         const deletePresupuesto = await PresupuestoModel.deleteOne({ _id: req.params.presupuestoID })

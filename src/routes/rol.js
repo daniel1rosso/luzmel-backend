@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const RolModel = require('../models/RolModel');
-const checkAuth = require('../middleware/checkAuth');
 
 //--- Todos los roles ---//
 router.get('/', async(req, res) => {
@@ -14,7 +13,7 @@ router.get('/', async(req, res) => {
 });
 
 //--- Datos de un rol ---//
-router.get('/:rol_id', checkAuth, async(req, res) => {
+router.get('/:rol_id', async(req, res) => {
     try {
         const rol = await RolModel.find({ _id: req.params.rol_id });
         res.status(201).json(rol);
@@ -24,7 +23,7 @@ router.get('/:rol_id', checkAuth, async(req, res) => {
 });
 
 //--- Nuevo rol ---//
-router.post('/new_rol', checkAuth, async(req, res) => {
+router.post('/new_rol', async(req, res) => {
     try {
         const existingRol = await RolModel.find({ nombre: req.body.nombre })
         if (existingRol.length !== 0) {
@@ -41,7 +40,7 @@ router.post('/new_rol', checkAuth, async(req, res) => {
 });
 
 //--- Actualizacion de rol ---//
-router.put('/:rol_id', checkAuth, (req, res) => {
+router.put('/:rol_id', (req, res) => {
     RolModel.updateMany({ _id: req.params.activo_id }, { $set: req.body }).exec()
         .then(() => {
             res.json(req.body)
@@ -51,7 +50,7 @@ router.put('/:rol_id', checkAuth, (req, res) => {
 });
 
 //--- Borrado de rol ---//
-router.delete('/:rolID', checkAuth, async(req, res) => {
+router.delete('/:rolID', async(req, res) => {
     try {
         const deleteRol = await RolModel.deleteOne({ _id: req.params.rolID })
         res.status(200).json({

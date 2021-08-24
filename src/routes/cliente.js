@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const ClienteModel = require('../models/ClienteModel');
-const checkAuth = require('../middleware/checkAuth');
 
 //--- Todos los clientes ---//
-router.get('/', checkAuth, async(req, res) => {
+router.get('/', async(req, res) => {
     try {
         const clientes = await ClienteModel.find();
         res.status(201).json(clientes);
@@ -14,7 +13,7 @@ router.get('/', checkAuth, async(req, res) => {
 });
 
 //--- Datos de un cliente ---//
-router.get('/:cliente_id', checkAuth, async(req, res) => {
+router.get('/:cliente_id', async(req, res) => {
     try {
         const cliente = await ClienteModel.find({ _id: req.params.cliente_id });
         res.status(201).json(cliente);
@@ -24,7 +23,7 @@ router.get('/:cliente_id', checkAuth, async(req, res) => {
 });
 
 //--- Nuevo cliente ---//
-router.post('/new_cliente', checkAuth, async(req, res) => {
+router.post('/new_cliente', async(req, res) => {
     try {
         const existingCliente = await ClienteModel.find({ nombre: req.body.nombre, apellido: req.body.apellido })
         if (existingCliente.length !== 0) {

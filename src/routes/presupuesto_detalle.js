@@ -5,7 +5,7 @@ const ProductoModel = require('../models/ProductoModel');
 const checkAuth = require('../middleware/checkAuth');
 
 //--- Todos los detalle de un presupuesto ---//
-router.get('/:presupuesto_id', checkAuth, async(req, res) => {
+router.get('/:presupuesto_id', async(req, res) => {
     try {
         const presupuesto_detalle = await PresupuestoDetalleModel.find({ idPresupuesto: req.params.presupuesto_id });
         res.status(201).json(presupuesto_detalle);
@@ -45,7 +45,7 @@ router.post('/new_presupuesto_detalle/:presupuesto_id', async(req, res) => {
 });
 
 //--- Actualizacion de un detalle de presupuesto ---//
-router.put('/:presupuesto_detalle_id', checkAuth, async (req, res) => {
+router.put('/:presupuesto_detalle_id', async (req, res) => {
     const producto = req.body.producto
     const cantidad_detalle = req.body.cantidad
     
@@ -79,7 +79,7 @@ router.put('/:presupuesto_detalle_id', checkAuth, async (req, res) => {
 });
 
 //--- Borrado de una presupuesto ---//
-router.delete('/:detallePresupuestoID', checkAuth, async(req, res) => {
+router.delete('/:detallePresupuestoID', async(req, res) => {
     try {
         const producto = req.body.producto
         const cantidad_detalle = req.body.cantidad

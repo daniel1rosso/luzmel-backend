@@ -8,14 +8,10 @@ const checkAuth = require('../middleware/checkAuth');
 
 //--- Login al sistema ---//
 router.post('/', (req, res) => {
-    UsuarioModel.findOne({ username: req.body.username }).exec()
+    UsuarioModel.findOne({ nombreUsuario: req.body.nombreUsuario }).exec()
         .then(user => {
             if (user) {
-                if(user.activo[0].id == 0) {
-                    verifyPassword(user, req, res)
-                } else {
-                    res.status(500).json({ message: "Inactive user" , success: 0})
-                }
+                verifyPassword(user, req, res)
             } else {
                 res.json({ message: "Incorrect username or password...",  success: 0 })
             }
@@ -26,9 +22,10 @@ router.post('/', (req, res) => {
 
 //--- Verificacion de contraseña ---//
 const verifyPassword = (user, req, res) => {
-    bcrypt.compare(req.body.password, user.password, (err, result) => {
+    bcrypt.compare(req.body.contra, user.contra, (err, result) => {
         if (err) return res.status(500).json({ message: err })
         else {
+            console.log(result)
             if (result) {
                 return getToken(user, res)
             } else {
@@ -40,7 +37,7 @@ const verifyPassword = (user, req, res) => {
 
 //--- Generacion de Token ---//
 const getToken = (user, res) => {
-    const token = jwt.sign({ username: user.username, userId: user._id, },
+    const token = jwt.sign({ nombreUsuario: user.nombreUsuario, userId: user._id, },
         Math.random().toString(36).substring(0,20))
     
     // Save session in collection
@@ -48,6 +45,7 @@ const getToken = (user, res) => {
         user: user,
         token: token
     });
+    console.log(user)
     const createdSession = login.save();
     
     if(createdSession) {
@@ -57,9 +55,7 @@ const getToken = (user, res) => {
             "bearer": "Bearer",
             token: token,
             "id":user._id,
-            "username": user.username,
-            "nombre": user.nombre,
-            "authorities": {"authority":user.rol[0].nombre}
+            "nombreUsuario": user.nombreUsuario
         })
     } else {
         res.json({ message: "Auth successful",  success: 1 })
@@ -67,7 +63,7 @@ const getToken = (user, res) => {
 }
 
 //--- Logout al sistema ---//
-router.post('/logout', checkAuth, async (req, res) => {
+router.post('/logout', async (req, res) => {
     //-- Token Session --//
     const token_session = req.headers.authorization.split(" ")[1];
     const deletedSession = await LoginModel.deleteOne({ token: token_session })

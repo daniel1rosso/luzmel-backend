@@ -14,7 +14,7 @@ router.get('/', async(req, res) => {
 });
 
 //--- Datos de un estado ---//
-router.get('/:estado_id', checkAuth, async(req, res) => {
+router.get('/:estado_id', async(req, res) => {
     try {
         const estado = await EstadoModel.find({ _id: req.params.estado_id });
         res.status(201).json(estado);
@@ -24,7 +24,7 @@ router.get('/:estado_id', checkAuth, async(req, res) => {
 });
 
 //--- Nuevo estado ---//
-router.post('/new_estado', checkAuth, async(req, res) => {
+router.post('/new_estado', async(req, res) => {
     try {
         const existingEstado = await EstadoModel.find({ nombre: req.body.nombre })
         if (existingEstado.length !== 0) {
@@ -41,7 +41,7 @@ router.post('/new_estado', checkAuth, async(req, res) => {
 });
 
 //--- Actualizacion del estado ---//
-router.put('/:estado_id', checkAuth, (req, res) => {
+router.put('/:estado_id', (req, res) => {
     EstadoModel.updateMany({ _id: req.params.estado_id }, { $set: req.body }).exec()
         .then(() => {
             res.json(req.body)
@@ -51,7 +51,7 @@ router.put('/:estado_id', checkAuth, (req, res) => {
 });
 
 //--- Borrado del estado ---//
-router.delete('/:estadoID', checkAuth, async(req, res) => {
+router.delete('/:estadoID', async(req, res) => {
     try {
         const deleteEstado = await EstadoModel.deleteOne({ _id: req.params.estadoID })
         res.status(200).json({
