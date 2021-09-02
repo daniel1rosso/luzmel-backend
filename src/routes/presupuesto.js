@@ -25,7 +25,6 @@ router.get('/:presupuesto_id', async(req, res) => {
 //--- Nuevo presupuesto ---//
 router.post('/new_presupuesto', async(req, res) => {
     try {
-
         const presupuesto = new PresupuestoModel({
             cliente: req.body.cliente,
             estado: req.body.estado,
