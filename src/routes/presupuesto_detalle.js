@@ -20,12 +20,12 @@ router.post('/new_presupuesto_detalle/:presupuesto_id', async(req, res) => {
         const producto = req.body.producto
         const cantidad_detalle = req.body.cantidad
         //-- Producto de la coleccion --//
-        producto_collection = await ProductoModel.find({ _id: producto._id })
+        const producto_collection = await ProductoModel.find({ _id: producto._id })
         //-- Nuevo sotck --//
-        const cantidad_stock = producto_collection[0].cantidad - cantidad_detalle
+        const cantidad_stock = parseInt(producto_collection[0].cantidadProducto) - parseInt(cantidad_detalle)
         //-- Asignacion del nuevo stock del producto --//
-        producto.cantidad = cantidad_stock
-        
+        producto.cantidadProducto = cantidad_stock
+
         ProductoModel.updateMany({ _id:  producto._id }, { $set: producto }).exec()
         .then(() => {
             const presupuesto_detalle = new PresupuestoDetalleModel({
@@ -50,20 +50,21 @@ router.put('/:presupuesto_detalle_id', async (req, res) => {
     const cantidad_detalle = req.body.cantidad
     
     //-- Producto de la coleccion --//
-    producto_collection = await ProductoModel.find({ _id: producto._id })
-    presupuesto_detalle = await PresupuestoDetalleModel.find({ _id: req.params.presupuesto_detalle_id });
-    
+    const producto_collection = await ProductoModel.find({ _id: producto._id })
+    const presupuesto_detalle = await PresupuestoDetalleModel.find({ _id: req.params.presupuesto_detalle_id });
+
     //-- Nuevo sotck --//
-    if (cantidad_detalle > presupuesto_detalle.cantidad){
-        cantidad_stock = producto_collection[0].cantidad - cantidad_detalle
-    } else if (cantidad_detalle < presupuesto_detalle.cantidad) {
-        cantidad_stock = producto_collection[0].cantidad + cantidad_detalle
-    } else {
+    let cantidad_stock = 0;
+    if (cantidad_detalle > presupuesto_detalle[0].cantidad){
+        cantidad_stock = producto_collection[0].cantidadProducto - cantidad_detalle
+    } else if (cantidad_detalle < presupuesto_detalle[0].cantidad) {
+        cantidad_stock = producto_collection[0].cantidadProducto + cantidad_detalle
+    } else if (cantidad_detalle == presupuesto_detalle[0].cantidad) {
         cantidad_stock = cantidad_detalle
     }
     
     //-- Asignacion del nuevo stock del producto --//
-    (cantidad_detalle != presupuesto_detalle.cantidad) ? producto.cantidad = cantidad_stock : "";
+    (cantidad_detalle != presupuesto_detalle.cantidadProducto) ? producto.cantidadProducto = cantidad_stock : "";
 
     ProductoModel.updateMany({ _id:  producto._id }, { $set: producto }).exec()
     .then( async () => {
@@ -80,29 +81,27 @@ router.put('/:presupuesto_detalle_id', async (req, res) => {
 
 //--- Borrado de una presupuesto ---//
 router.delete('/:detallePresupuestoID', async(req, res) => {
-    try {
-        const producto = req.body.producto
-        const cantidad_detalle = req.body.cantidad
-        //-- Producto de la coleccion --//
-        producto_collection = await ProductoModel.find({ _id: producto._id })
-        //-- Nuevo sotck --//
-        const cantidad_stock = producto_collection[0].cantidad + cantidad_detalle
-        //-- Asignacion del nuevo stock del producto --//
-        producto.cantidad = cantidad_stock
+    const presupuesto_detalle = await PresupuestoDetalleModel.find({ _id: req.params.detallePresupuestoID });
+    const producto = presupuesto_detalle[0].producto
 
-        ProductoModel.updateMany({ _id:  producto._id }, { $set: producto }).exec()
-        .then( async () => {
-            const deletedDetallePrespuesto = await PresupuestoDetalleModel.deleteOne({ _id: req.params.detallePresupuestoID })
-            res.status(200).json({
-                message: 'Detalle de presupuesto been deleted ...',
-                data: deletedDetallePrespuesto,
-            })
-        }).catch(err => {
-            res.status(500).json({ message: err })
+    const cantidad_detalle = presupuesto_detalle[0].cantidad
+    //-- Producto de la coleccion --//
+    const producto_collection = await ProductoModel.find({ _id: producto[0]._id })
+    //-- Nuevo sotck --//
+    const cantidad_stock = producto_collection[0].cantidadProducto + cantidad_detalle
+    //-- Asignacion del nuevo stock del producto --//
+    producto[0].cantidadProducto = cantidad_stock
+
+    ProductoModel.updateMany({ _id:  producto[0]._id }, { $set: producto[0] }).exec()
+    .then( async () => {
+        const deletedDetallePrespuesto = await PresupuestoDetalleModel.deleteOne({ _id: req.params.detallePresupuestoID })
+        res.status(200).json({
+            message: 'Detalle de presupuesto been deleted ...',
+            data: deletedDetallePrespuesto,
         })
-    } catch (error) {
-        res.status(500).json({ message: error })
-    }
+    }).catch(err => {
+        res.status(500).json({ message: err })
+    })
 });
 
 module.exports = router;
