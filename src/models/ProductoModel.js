@@ -5,6 +5,7 @@ const ProductoSchema = mongoose.Schema({
     disponibles: Number,
     descripcion: String,
     cantidadProducto: Number,
+    cantidadStock: Number,
     precioUnitario: Number,
     clasificacion: Array,
     created: { type: Date, default: Date.now }

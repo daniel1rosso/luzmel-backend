@@ -31,6 +31,7 @@ router.post('/new_producto', async(req, res) => {
         const producto = new ProductoModel({
             nombre: req.body.nombre,
             cantidadProducto: req.body.cantidadProducto,
+            cantidadStock: req.body.cantidadProducto,
             descripcion: req.body.descripcion,
             precioUnitario: req.body.precioUnitario,
             disponibles: req.body.disponibles,
